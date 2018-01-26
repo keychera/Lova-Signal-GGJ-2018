@@ -17,6 +17,7 @@ public class Laser : MonoBehaviour
     public Direction initialDirection;
     Vector2 laserDirection;
     public float laserLength = 10f;
+    Vector2 startingPoint;
 
     void OnValidate()
     {
@@ -45,17 +46,52 @@ public class Laser : MonoBehaviour
     void Start()
     {
         line = GetComponent<LineRenderer>();
-        line.positionCount = 2;
     }
 
     void Update()
     {
         SyncDirection();
+        line.positionCount = 1;
+        bool keepReflecting = true;
         line.SetPosition(0, transform.position);
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, laserDirection, laserLength);
+        startingPoint = transform.position;
+        int vertexCounter = 0;
+        do
+        {
+            int layerMask = LayerMask.GetMask("World");
+            RaycastHit2D hit = Physics2D.Raycast((Vector2)startingPoint + laserDirection * 1, laserDirection, laserLength,layerMask);
+            vertexCounter++;
+            line.positionCount += 1;
+            if (hit)
+            {
+                line.SetPosition(vertexCounter, hit.point);
+                Mirror mirror = hit.collider.GetComponent<Mirror>();
+                if (mirror != null)
+                {
+                    laserDirection = GetNextDirection(mirror.direction);
+                    if (laserDirection == Vector2.zero) {
+                        keepReflecting = false;
+                    } else {
+                        startingPoint = hit.point;
+                    }
+                }
+            }
+            else
+            {
+                if (vertexCounter == 1)
+                {
+                    line.positionCount = 2;
+                }
+                line.SetPosition(vertexCounter, (Vector2)startingPoint + laserDirection * laserLength);
+                keepReflecting = false;
+            }
+        } while (keepReflecting);
+
+
+
+        /* 
         if (hit)
         {
-            bool keepReflecting = true;
             RaycastHit2D currentHit = hit;
             while (keepReflecting)
             {
@@ -90,7 +126,7 @@ public class Laser : MonoBehaviour
         {
             line.SetPosition(1, (Vector2)transform.position + laserDirection * laserLength);
             line.positionCount = 2;
-        }
+        }*/
     }
 
     Vector2 GetNextDirection(Mirror.Direction direction)
