@@ -41,3 +41,15 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Objects
+    uniqueID: 1038965773
+    locked: 0
+  - name: Laser
+    uniqueID: 4236668997
+    locked: 0
+  - name: Mirrors
+    uniqueID: 473394949
+    locked: 0
+  - name: Walls
+    uniqueID: 1165130127
+    locked: 0
