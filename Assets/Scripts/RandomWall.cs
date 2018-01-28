@@ -3,25 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class RandomWall : MonoBehaviour {
-
-    public Transform wall1;
-    public Transform wall2;
+    public List<Sprite> sprites;
 
     // Use this for initialization
     void Start () {
-
-        for (int y = -4; y < 5; y++) {
-            for (int x = -4; x < 5; x++) {
-                if(y == -4 || y == 4 || x == -4 || x == 4) {
-                    float randVal = Random.Range(0f, 1f);
-                    if (randVal < 0.5f)
-                        Instantiate(wall1, new Vector3(x, y, 0), Quaternion.identity);
-                    else
-                        Instantiate(wall2, new Vector3(x, y, 0), Quaternion.identity);
-                }
-                
-            }
-        }
+        
+        SpriteRenderer render;
+        render = GetComponent<SpriteRenderer>();
+        render.sprite = sprites.ToArray()[Random.Range(0,sprites.Count)];
     }
 	
 	// Update is called once per frame

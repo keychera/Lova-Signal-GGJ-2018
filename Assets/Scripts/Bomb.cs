@@ -26,7 +26,7 @@ public class Bomb : MonoBehaviour
     void IsHit()
     {
 		StartCoroutine(Explode());
-        Destroy(gameObject, 0.2f);
+        Destroy(gameObject, 1f);
     }
 
     private IEnumerator Explode()
@@ -34,7 +34,7 @@ public class Bomb : MonoBehaviour
         for (int i = 0; i < 200; i++)
         {
 			sprite.color = new Color(sprite.color.r,sprite.color.g,sprite.color.b,sprite.color.a - 0.005f);
-            yield return new WaitForSeconds(0.01f);
+            yield return new WaitForSeconds(0.125f);
         }
     }
 

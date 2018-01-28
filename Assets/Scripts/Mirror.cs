@@ -17,9 +17,19 @@ public class Mirror : MonoBehaviour
     {
         Rotatable,
         Static,
-        Through
+        Through,
+        Multi
     }
     public Type type;
+    private bool isHit;
+    private Vector2 laserDirection;
+    public GameObject laserRenderer;
+    private List<GameObject> generatedLasers;
+
+    void Awake() {
+        generatedLasers = new List<GameObject>();
+    }
+
 
     void OnValidate()
     {
@@ -70,6 +80,10 @@ public class Mirror : MonoBehaviour
 
     internal Vector2 GetNextDirection(Vector2 laserDirection)
     {
+        if (type == Type.Multi)
+        {
+            return Vector2.zero;
+        }
         switch (direction)
         {
             case Mirror.Direction.first:
@@ -113,9 +127,64 @@ public class Mirror : MonoBehaviour
                 }
                 break;
         }
-        if (type == Type.Through) {
-            return laserDirection;    
+        if (type == Type.Through)
+        {
+            return laserDirection;
         }
         return Vector2.zero;
+    }
+
+    internal void InvokeOnHit(Vector2 incomingLaserDirection)
+    {
+        isHit = true;
+        laserDirection = incomingLaserDirection;
+    }
+
+    void LateUpdate() {
+		if (isHit) {
+			isHit = false;
+            if (type == Type.Multi && generatedLasers.Count == 0) {
+                GenerateMultiMirror(laserDirection);
+            }
+		} else {
+            if (type == Type.Multi && generatedLasers.Count != 0) {
+                DestroyLasers();
+            }
+			GetComponent<SpriteRenderer>().color = Color.white;
+		}
+	}
+
+    private void DestroyLasers()
+    {
+        foreach (var Laser in generatedLasers)
+        {
+            Destroy(Laser,0.01f);
+        }
+        generatedLasers.Clear();
+    }
+
+    private void GenerateMultiMirror(Vector2 laserDirection)
+    {
+        if (laserDirection != Vector2.up) {
+            GameObject newRenderer = Instantiate(laserRenderer, transform.position,Quaternion.identity);
+            newRenderer.GetComponent<Laser>().initialDirection = Laser.Direction.Down;
+            generatedLasers.Add(newRenderer);
+        }
+        if (laserDirection != Vector2.down) {
+            GameObject newRenderer = Instantiate(laserRenderer, transform.position,Quaternion.identity);
+            newRenderer.GetComponent<Laser>().initialDirection = Laser.Direction.Up;
+            generatedLasers.Add(newRenderer);
+        }
+        if (laserDirection != Vector2.right) {
+            GameObject newRenderer = Instantiate(laserRenderer, transform.position,Quaternion.identity);
+            newRenderer.GetComponent<Laser>().initialDirection = Laser.Direction.Left;
+            generatedLasers.Add(newRenderer);
+            
+        }
+        if (laserDirection != Vector2.left) {
+            GameObject newRenderer = Instantiate(laserRenderer, transform.position,Quaternion.identity);
+            newRenderer.GetComponent<Laser>().initialDirection = Laser.Direction.Right;
+            generatedLasers.Add(newRenderer);
+        }
     }
 }
