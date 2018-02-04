@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider2D))]
-public class LaserHitDetector : MonoBehaviour
+public class LaserHitDetector : MonoBehaviour, IInvoked
 {
     public delegate void OnHitAction();
     public event OnHitAction OnHit;
 
-    internal void InvokeOnHit()
+    public void InvokeOnHit(Vector2 laserDirection)
     {
         if (OnHit != null)
         {

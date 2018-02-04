@@ -17,9 +17,10 @@ public class Laser : MonoBehaviour
     }
 
     public Direction initialDirection;
-    Vector2 laserDirection;
+    public Vector2 laserDirection;
     public float laserLength = 10f;
     Vector2 startingPoint;
+	public IInvoked invokedLater;
 
     void OnValidate()
     {
@@ -82,7 +83,8 @@ public class Laser : MonoBehaviour
                 Mirror mirror = hit.collider.GetComponent<Mirror>();
                 if (mirror != null && reflectionCount < 100)
                 {
-                    mirror.InvokeOnHit(laserDirection);
+                    //mirror.InvokeOnHit(laserDirection);
+                    invokedLater = mirror.GetComponent<IInvoked>();
                     laserDirection = mirror.GetNextDirection(laserDirection);
                     if (laserDirection == Vector2.zero) {
                         keepReflecting = false;
@@ -90,9 +92,12 @@ public class Laser : MonoBehaviour
                         startingPoint = mirror.transform.position;
                     }
                 } else {
-                    LaserHitDetector hitByLaser = hit.collider.GetComponent<LaserHitDetector>();
+                    IInvoked hitByLaser = hit.collider.GetComponent<IInvoked>();
                     if(hitByLaser != null) {
-                        hitByLaser.InvokeOnHit();
+                        //hitByLaser.InvokeOnHit(laserDirection);
+                        invokedLater = hitByLaser;
+                    } else {
+                        invokedLater = null;
                     }
                     keepReflecting = false;
                 }

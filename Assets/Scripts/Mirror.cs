@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Mirror : MonoBehaviour
+public class Mirror : MonoBehaviour, IInvoked
 {
     public enum Direction
     {
@@ -25,6 +25,8 @@ public class Mirror : MonoBehaviour
     private Vector2 laserDirection;
     public GameObject laserRenderer;
     private List<GameObject> generatedLasers;
+    //uuhhh
+    Vector2 multiLaserEnterWhatTheHeck;
 
     void Awake() {
         generatedLasers = new List<GameObject>();
@@ -57,8 +59,9 @@ public class Mirror : MonoBehaviour
 
     public void Rotate()
     {
-        if (type != Type.Static)
+        if (type != Type.Static || type != Type.Multi)
         {
+            SoundEffectManager.Instance.PlayRotate();
             switch (direction)
             {
                 case Direction.first:
@@ -75,6 +78,8 @@ public class Mirror : MonoBehaviour
                     break;
             }
             SyncDirection();
+        } else {
+            SoundEffectManager.Instance.PlayCantAct();
         }
     }
 
@@ -82,6 +87,7 @@ public class Mirror : MonoBehaviour
     {
         if (type == Type.Multi)
         {
+            multiLaserEnterWhatTheHeck = laserDirection;
             return Vector2.zero;
         }
         switch (direction)
@@ -134,7 +140,7 @@ public class Mirror : MonoBehaviour
         return Vector2.zero;
     }
 
-    internal void InvokeOnHit(Vector2 incomingLaserDirection)
+    public void InvokeOnHit(Vector2 incomingLaserDirection)
     {
         isHit = true;
         laserDirection = incomingLaserDirection;
@@ -165,23 +171,23 @@ public class Mirror : MonoBehaviour
 
     private void GenerateMultiMirror(Vector2 laserDirection)
     {
-        if (laserDirection != Vector2.up) {
+        if (multiLaserEnterWhatTheHeck != Vector2.up) {
             GameObject newRenderer = Instantiate(laserRenderer, transform.position,Quaternion.identity);
             newRenderer.GetComponent<Laser>().initialDirection = Laser.Direction.Down;
             generatedLasers.Add(newRenderer);
         }
-        if (laserDirection != Vector2.down) {
+        if (multiLaserEnterWhatTheHeck != Vector2.down) {
             GameObject newRenderer = Instantiate(laserRenderer, transform.position,Quaternion.identity);
             newRenderer.GetComponent<Laser>().initialDirection = Laser.Direction.Up;
             generatedLasers.Add(newRenderer);
         }
-        if (laserDirection != Vector2.right) {
+        if (multiLaserEnterWhatTheHeck != Vector2.right) {
             GameObject newRenderer = Instantiate(laserRenderer, transform.position,Quaternion.identity);
             newRenderer.GetComponent<Laser>().initialDirection = Laser.Direction.Left;
             generatedLasers.Add(newRenderer);
             
         }
-        if (laserDirection != Vector2.left) {
+        if (multiLaserEnterWhatTheHeck != Vector2.left) {
             GameObject newRenderer = Instantiate(laserRenderer, transform.position,Quaternion.identity);
             newRenderer.GetComponent<Laser>().initialDirection = Laser.Direction.Right;
             generatedLasers.Add(newRenderer);
